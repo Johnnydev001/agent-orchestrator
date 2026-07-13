@@ -17,5 +17,11 @@ if __name__ == "__main__":
 
     print("Running graph with prompt:", args.prompt + "\n")
 
+    # Each output object represents the state updates from each node in the graph for a single step of execution. 
+    # The graph will continue to execute until it reaches a terminal state (END).
     for output in graph.stream(inputs, config):
-        print(f"Output: {output}")
+        for node_name, state_update in output.items():
+            messages = state_update.get("messages", [])[0].content
+
+            if(messages):
+                print(f"Messages from {node_name}: {messages}\n")
