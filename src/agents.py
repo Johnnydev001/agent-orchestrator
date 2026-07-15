@@ -1,64 +1,69 @@
 import os
 
+from deepagents import create_deep_agent
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage
+from e2b import Sandbox
+from langchain_e2b import E2BSandbox
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from state import MessagesState, RouterState
-from tools import write_to_file
 
 load_dotenv()
 
+# Initialize E2B sandbox environment
+e2b_sandbox = Sandbox.create()
+backend = E2BSandbox(sandbox=e2b_sandbox)
+
 # Initialize the model with the specified parameters
-api_key = os.getenv("OPENAI_API_KEY")
-llm = ChatOpenAI(model="gpt-4o", temperature=0.7, max_tokens=1000, openai_api_key=api_key)
+open_ai_api_key = os.getenv("OPENAI_API_KEY")
+model = ChatOpenAI(model="gpt-4o", openai_api_key=open_ai_api_key)
 
-print("Model initialized successfully")
+print("Model initialized successfully!\n")
 
-# Agents definitions
-def backend_developer_agent(state: MessagesState) -> dict:
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a Senior Backend Developer. Write efficient, secure Python code. "
-                   "Only focus on the server-side logic. Do not write frontend code. Create the necessary files in output/backend. When you have code to write, use the write_to_file tool. Do not respond with explanations without making tool calls."),
-        MessagesPlaceholder(variable_name="messages"),
-    ])
+frontend_agent = create_deep_agent(
+    model=model,
+    backend=backend,
+    system_prompt="You are a Senior Frontend Developer. Capable of creating optimized, responsive and clean UIs using tools such as React and Vue. Always use TypeScript for frontend code. For styling use CSS. Create the necessary files in output/frontend. When you have code to write, use the write_to_file tool.",
+)
 
-    llm_with_tools = llm.bind_tools([write_to_file])
-    chain = prompt | llm_with_tools
-    response = chain.invoke(state)
+router_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a Tech Lead. Based on the conversation, decide who should act next. "
+            "If the task requires UI, route to 'frontend_developer_agent'. If the work is "
+            "done and the app is complete, route to 'FINISH'. If an agent just responded "
+            "but hasn't completed their work yet, you can route back to them. The last "
+            "agent was: {last_agent}.",
+        ),
+        MessagesPlaceholder("messages"),
+    ]
+)
+router_chain = router_prompt | model.with_structured_output(RouterState)
+
+def run_frontend_deep_agent(state: MessagesState):
+    invocation_input = state
+    print(f"Frontend agent input: {invocation_input}\n")
+
+    response = frontend_agent.invoke(invocation_input)
+    print(f"Frontend agent output: {response}\n")
+
     return {
-        "messages": [response],
-        "last_agent": "backend_developer_agent"
-    }
-
-def frontend_developer_agent(state: MessagesState) -> dict:
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a Senior Frontend Developer. Capable of creating optimized, responsive and clean UIs using tools such as React and Vue. Always use TypeScript for frontend code. For styling use Tailwind CSS. Only focus on the UI/UX. Do not write server code. Create the necessary files in output/frontend. When you have code to write, use the write_to_file tool. Do not respond with explanations without making tool calls."),
-        MessagesPlaceholder(variable_name="messages"),
-    ])
-    llm_with_tools = llm.bind_tools([write_to_file])
-    chain = prompt | llm_with_tools
-    response = chain.invoke(state)
-    return {
-        "messages": [response],
+        "messages": response["messages"],
         "last_agent": "frontend_developer_agent"
     }
 
-def router(state: MessagesState) -> dict:
-    last_agent = state.get("last_agent", "none")
-    
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", f"You are a Tech Lead. Based on the conversation, decide who should act next. "
-                   f"Last agent that executed: {last_agent}. "
-                   "If the task requires UI, route to 'frontend_developer_agent'. "
-                   "If it requires data/APIs, route to 'backend_developer_agent'. "
-                   "If both are done and the app is complete, route to 'FINISH'. "
-                   "If an agent just responded but hasn't completed their work yet, you can route back to them."),
-        MessagesPlaceholder(variable_name="messages"),
-    ])
-    
-    router_chain = prompt | llm.with_structured_output(RouterState)
-    response = router_chain.invoke(state)
+def run_router_agent(state: MessagesState):
+    invocation_input = {
+        "messages": state["messages"],
+        "last_agent": state.get("last_agent", "No agent has responded yet"),
+    }
+    print(f"Router agent input: {invocation_input}\n")
+
+    response = router_chain.invoke(invocation_input)
+    print(f"Router agent output: {response}\n")
+
     return {
-        "next_agent": response.next_agent
+        "next_agent": response.next_agent,
+        "last_agent": "router"
     }

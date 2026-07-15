@@ -3,10 +3,10 @@ from langgraph.graph import START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 
-from agents import frontend_developer_agent, backend_developer_agent, router
+from agents import run_router_agent, run_frontend_deep_agent
 from tools import write_to_file
-from state import MessagesState
 from utils import route_based_on_last_message, route_from_supervisor
+from state import MessagesState
 
 # Custom tool node to execute the write_to_file tool and save results in state
 tools_node = ToolNode([write_to_file])
@@ -16,25 +16,21 @@ memory_saver = MemorySaver()
 
 builder = StateGraph(MessagesState)
 
-builder.add_node("router", router)
-builder.add_node("frontend_developer_agent", frontend_developer_agent)
-builder.add_node("backend_developer_agent", backend_developer_agent)
+builder.add_node("frontend_developer_agent", run_frontend_deep_agent)
+builder.add_node("router_agent", run_router_agent)
 builder.add_node("tools", tools_node)
 
-# Add conditional edges from agents - if they call tools, go to tools node, else go to router
-builder.add_conditional_edges("frontend_developer_agent", route_based_on_last_message, {"tools": "tools", "router": "router"})
-builder.add_conditional_edges("backend_developer_agent", route_based_on_last_message, {"tools": "tools", "router": "router"})
-
-builder.add_edge("tools", "router") # After tools execute, go back to router
+builder.add_edge(START, "router_agent")
+builder.add_edge("tools", "router_agent")
 builder.add_conditional_edges(
-	"router",
+	"router_agent",
 	route_from_supervisor,
-	{
-		"frontend_developer_agent": "frontend_developer_agent",
-		"backend_developer_agent": "backend_developer_agent",
-		END: END,
-	},
+	{"frontend_developer_agent": "frontend_developer_agent", END: END},
 )
-builder.add_edge(START, "router")
+builder.add_conditional_edges(
+	"frontend_developer_agent",
+	route_based_on_last_message,
+	{"tools": "tools", "router": "router_agent"},
+)
 
 graph = builder.compile(checkpointer=memory_saver,  interrupt_before=["tools"])
