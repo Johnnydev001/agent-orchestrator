@@ -23,7 +23,10 @@ print("Model initialized successfully!\n")
 frontend_agent = create_deep_agent(
     model=model,
     backend=backend,
-    system_prompt="You are a Senior Frontend Developer. Capable of creating optimized, responsive and clean UIs using tools such as React and Vue. Always use TypeScript for frontend code. For styling use CSS. Create the necessary files in output/frontend. When you have code to write, use the write_to_file tool.",
+    system_prompt="You are a Senior Frontend Developer. Capable of creating optimized, responsive and clean UIs using tools such as React and Vue. Always use TypeScript for frontend code. For styling use CSS. Create the necessary files inside /home/user/output/frontend in the E2B sandbox, not /frontend. When you have code to write, use the write_file tool.",
+    interrupt_on={
+        "write_file": {"allowed_decisions": ["approve", "reject"]}
+    }
 )
 
 router_prompt = ChatPromptTemplate.from_messages(
@@ -43,14 +46,12 @@ router_chain = router_prompt | model.with_structured_output(RouterState)
 
 def run_frontend_deep_agent(state: MessagesState):
     invocation_input = state
-    print(f"Frontend agent input: {invocation_input}\n")
-
     response = frontend_agent.invoke(invocation_input)
     print(f"Frontend agent output: {response}\n")
 
     return {
         "messages": response["messages"],
-        "last_agent": "frontend_developer_agent"
+        "last_agent": "frontend_developer_agent",
     }
 
 def run_router_agent(state: MessagesState):
@@ -58,8 +59,6 @@ def run_router_agent(state: MessagesState):
         "messages": state["messages"],
         "last_agent": state.get("last_agent", "No agent has responded yet"),
     }
-    print(f"Router agent input: {invocation_input}\n")
-
     response = router_chain.invoke(invocation_input)
     print(f"Router agent output: {response}\n")
 
