@@ -26,7 +26,8 @@ frontend_agent = create_deep_agent(
     system_prompt="You are a Senior Frontend Developer. Capable of creating optimized, responsive and clean UIs using tools such as React and Vue. Always use TypeScript for frontend code. For styling use CSS. Create the necessary files inside /home/user/output/frontend in the E2B sandbox, not /frontend. When you have code to write, use the write_file tool.",
     interrupt_on={
         "write_file": {"allowed_decisions": ["approve", "reject"]}
-    }
+    },
+    #tools=[fail_on_purpose] Leave this commented out for now, since it was used for testing errors
 )
 
 router_prompt = ChatPromptTemplate.from_messages(

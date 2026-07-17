@@ -2,7 +2,7 @@ import argparse
 import sys
 from uuid import uuid4
 
-from langgraph.types import Command
+from langgraph.types import Command, RunnableConfig
 
 from graph import graph
 from agents import e2b_sandbox
@@ -16,7 +16,7 @@ def main():
 
     try:
         thread_id = str(uuid4())
-        config = {"configurable": {"thread_id": thread_id}}
+        config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
         
         result = graph.invoke({
             "messages": [
@@ -54,12 +54,11 @@ def main():
                     else:
                         print("Execution left paused: approval was not entered.")
 
-        print(f"Graph invoke result: {result}\n")
-
-        print(e2b_sandbox.files.read("/home/user/output/frontend/h1.html"))
+        graph_invoke_result = result
+        print(f"Graph invoke result: {graph_invoke_result}\n")
 
         e2b_sandbox.kill()
-       
+
     except KeyboardInterrupt:
         print("\nCancelled by user.", file=sys.stderr)
         return 130

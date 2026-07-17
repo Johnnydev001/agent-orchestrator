@@ -16,6 +16,7 @@ dependencies = [
     { name = "langchain-e2b" },
     { name = "langchain-openai" },
     { name = "langgraph" },
+    { name = "langsmith" },
     { name = "python-dotenv" },
 ]
 
@@ -26,6 +27,7 @@ requires-dist = [
     { name = "langchain-e2b" },
     { name = "langchain-openai", specifier = ">=1.3.5" },
     { name = "langgraph", specifier = "==1.2.9" },
+    { name = "langsmith", extras = ["sandbox"], specifier = ">=0.10.2" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
 ]
 
