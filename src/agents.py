@@ -16,7 +16,7 @@ backend = E2BSandbox(sandbox=e2b_sandbox)
 
 # Initialize the model with the specified parameters
 open_ai_api_key = os.getenv("OPENAI_API_KEY")
-model = ChatOpenAI(model="gpt-4o", openai_api_key=open_ai_api_key)
+model = ChatOpenAI(model="gpt-5.4-nano", openai_api_key=open_ai_api_key)
 
 print("Model initialized successfully!\n")
 
