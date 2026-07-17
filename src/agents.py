@@ -27,7 +27,7 @@ frontend_agent = create_deep_agent(
     interrupt_on={
         "write_file": {"allowed_decisions": ["approve", "reject"]}
     },
-    #tools=[fail_on_purpose] Leave this commented out for now, since it was used for testing errors
+    # tools=[fail_on_purpose]  # Leave this commented out for now, since it was used for testing errors
 )
 
 router_prompt = ChatPromptTemplate.from_messages(
