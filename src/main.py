@@ -4,8 +4,8 @@ from uuid import uuid4
 
 from langgraph.types import Command, RunnableConfig
 
-from graph import graph
-from agents import e2b_sandbox
+from .graph import graph
+from .agents import e2b_sandbox
 
 def main():
     arg_parser = argparse.ArgumentParser(description="Run the agent orchestrator.")

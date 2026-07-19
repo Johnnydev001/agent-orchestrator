@@ -1,0 +1,4 @@
+[{
+    "input": "Create a simple HTML file with only one H1 tag that says 'Hello World'.",
+    "expected_output": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Hello World</title>\n</head>\n<body>\n    <h1>Hello World</h1> </body>\n</html>"
+}]

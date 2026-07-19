@@ -42,7 +42,7 @@ Set `OPENAI_API_KEY` and `E2B_API_KEY` in `.env` to your OpenAI and E2B API keys
 ## How to Run
 
 ```bash
-uv run python src/main.py "create a simple HTML page"
+uv run python -m src.main "create a simple HTML page"
 ```
 
 Write operations may pause and ask for approval in the terminal before continuing.

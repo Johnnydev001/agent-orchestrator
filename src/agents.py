@@ -6,7 +6,7 @@ from e2b import Sandbox
 from langchain_e2b import E2BSandbox
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from state import MessagesState, RouterState
+from .state import MessagesState, RouterState
 
 load_dotenv()
 
@@ -20,6 +20,8 @@ model = ChatOpenAI(model="gpt-5.4-nano", openai_api_key=open_ai_api_key)
 
 print("Model initialized successfully!\n")
 
+
+# Agent creations
 frontend_agent = create_deep_agent(
     model=model,
     backend=backend,
@@ -27,7 +29,6 @@ frontend_agent = create_deep_agent(
     interrupt_on={
         "write_file": {"allowed_decisions": ["approve", "reject"]}
     },
-    # tools=[fail_on_purpose]  # Leave this commented out for now, since it was used for testing errors
 )
 
 router_prompt = ChatPromptTemplate.from_messages(
@@ -45,6 +46,7 @@ router_prompt = ChatPromptTemplate.from_messages(
 )
 router_chain = router_prompt | model.with_structured_output(RouterState)
 
+# Agent execution functions
 def run_frontend_deep_agent(state: MessagesState):
     invocation_input = state
     response = frontend_agent.invoke(invocation_input)

@@ -1,6 +1,7 @@
 from langchain_core.tools import tool
 from langsmith import traceable
-    
+
+# Functions used for testing with Langsmith    
 @tool
 def fail_on_purpose():
     """
@@ -17,4 +18,3 @@ def parse_prompt_to_messages(prompt: str) -> str:
     """
     parsed_prompt = prompt.strip()
     return parsed_prompt
-   
