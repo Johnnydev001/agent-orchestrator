@@ -1,0 +1,7 @@
+[
+  {
+    "input": "Create a Github Actions pipeline that deploys a simple HTML file with one button to Github Pages",
+    "expected_output": "name: Deploy HTML to Github Pages\non: [push]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v2\n      - name: Deploy\n        uses: peaceiris/actions-gh-pages@v3\n        with:\n          github_token: ${{ secrets.GITHUB_TOKEN }}\n          publish_dir: ./",
+    "type": "devops"
+  }
+]

@@ -1,0 +1,7 @@
+[
+  {
+    "input": "Create the documentation in Markdown for both frontend, backend and infrastructure of a fullstack app that has a button that calls an API which returns a greeting message.",
+    "expected_output": "# Fullstack App Documentation\n\n## Overview\nThis application consists of a frontend, backend, and infrastructure setup that allows users to click a button on a webpage, which triggers an API call to return a greeting message.\n\n## Frontend\nThe frontend is a simple HTML file that contains a button. When the button is clicked, it sends a POST request to the backend API endpoint `/greet` with a JSON payload containing the name.\n\n### HTML Code\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Hello World</title>\n</head>\n<body>\n    <button onclick=\"fetch('/greet', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: 'World'})})\">Hello World</button>\n</body>\n</html>\n```\n\n## Backend\nThe backend is built using FastAPI. It has a single POST endpoint `/greet` that accepts a JSON payload with a `name` field and returns a greeting message.\n\n### FastAPI Code\n```python\nfrom fastapi import FastAPI, Request\n\napp = FastAPI()\n",
+    "type": "documentation"
+  }
+]

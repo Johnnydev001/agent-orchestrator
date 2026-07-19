@@ -1,0 +1,7 @@
+[
+  {
+    "input": "Create a FastAPI Post endpoint that accepts a JSON payload with a 'name' field and returns a greeting message.",
+    "expected_output": "from fastapi import FastAPI, Request\n\napp = FastAPI()\n\n@app.post('/greet')\nasync def greet(request: Request):\n    data = await request.json()\n    name = data.get('name')\n    return {'message': f'Hello, {name}'}",
+    "type": "backend"
+  }
+]

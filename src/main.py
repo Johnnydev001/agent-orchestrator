@@ -1,11 +1,17 @@
 import argparse
 import sys
+from pathlib import Path
 from uuid import uuid4
 
 from langgraph.types import Command, RunnableConfig
 
-from .graph import graph
-from .agents import e2b_sandbox
+if __package__:
+    from .agents import e2b_sandbox
+    from .graph import graph
+else:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from src.agents import e2b_sandbox
+    from src.graph import graph
 
 def main():
     arg_parser = argparse.ArgumentParser(description="Run the agent orchestrator.")

@@ -10,4 +10,4 @@ class MessagesState(TypedDict):
     next_agent: str
 
 class RouterState(BaseModel):
-    next_agent: Literal["frontend_developer_agent", "FINISH"]
+    next_agent: Literal["frontend_agent", "backend_agent", "devops_agent", "ui_designer_agent", "documentation_agent", "FINISH"]

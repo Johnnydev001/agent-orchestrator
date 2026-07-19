@@ -1,4 +1,7 @@
-[{
-    "input": "Create a simple HTML file with only one H1 tag that says 'Hello World'.",
-    "expected_output": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Hello World</title>\n</head>\n<body>\n    <h1>Hello World</h1> </body>\n</html>"
-}]
+[
+  {
+    "input": "Create a simple HTML file with only one button that triggers an API call to '/greet'.",
+    "expected_output": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Hello World</title>\n</head>\n<body>\n    <button onclick=\"fetch('/greet', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: 'World'})})\">Hello World</button>\n</body>\n</html>",
+    "type": "frontend"
+  }
+]
